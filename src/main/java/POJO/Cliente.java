@@ -1,22 +1,20 @@
-
 package POJO;
 
 import java.util.ArrayList;
 import java.util.Set;
 
 public class Cliente {
-    
+
     private String dni;
     private String nombre;
     private String direccion;
 
-    public Cliente(String dni, String nombre, String direccion){
-        this.dni=dni;
-        this.nombre=nombre;
-        this.direccion=direccion;
+    public Cliente(String dni, String nombre, String direccion) {
+        this.dni = dni;
+        this.nombre = nombre;
+        this.direccion = direccion;
     }
-    
-    
+
     public String getDni() {
         return dni;
     }
@@ -41,6 +39,9 @@ public class Cliente {
         this.direccion = direccion;
     }
 
-    
-    
+    @Override
+    public String toString() {
+        return "CLIENTE\nNombre: " + this.nombre + "\nDNI: " + this.dni + "\nDirección: " + this.direccion;
+    }
+
 }

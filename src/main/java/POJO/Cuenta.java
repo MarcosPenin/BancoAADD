@@ -9,6 +9,12 @@ public abstract class Cuenta {
     private String sucursal;    
     private static ArrayList<Cliente> clientes=null;
 
+    public Cuenta(String numero,String sucursal,ArrayList<Cliente> clientes){
+        this.numero=numero;
+        this.sucursal=sucursal;
+        this.clientes=clientes;
+    }    
+    
     public String getNumero() {
         return numero;
     }

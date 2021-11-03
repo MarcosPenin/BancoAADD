@@ -1,13 +1,20 @@
-
 package POJO;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class CuentaPlazo extends Cuenta {
-    
+
     private float intereses;
     private Date fechaVencimiento;
-    private long depositoPlazo;
+    private double depositoPlazo;
+
+    public CuentaPlazo(String numero, String sucursal, ArrayList<Cliente> clientes, float intereses, Date fechaVencimiento, double depositoPlazo) {
+        super(numero, sucursal, clientes);
+        this.intereses = intereses;
+        this.fechaVencimiento = fechaVencimiento;
+        this.depositoPlazo = depositoPlazo;
+    }
 
     public float getIntereses() {
         return intereses;
@@ -25,11 +32,11 @@ public class CuentaPlazo extends Cuenta {
         this.fechaVencimiento = fechaVencimiento;
     }
 
-    public long getDepositoPlazo() {
+    public double getDepositoPlazo() {
         return depositoPlazo;
     }
 
-    public void setDepositoPlazo(long depositoPlazo) {
+    public void setDepositoPlazo(double depositoPlazo) {
         this.depositoPlazo = depositoPlazo;
     }
 }
