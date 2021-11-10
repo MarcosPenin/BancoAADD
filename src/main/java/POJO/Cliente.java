@@ -1,9 +1,10 @@
 package POJO;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class Cliente {
+public class Cliente implements Serializable{
 
     private String dni;
     private String nombre;

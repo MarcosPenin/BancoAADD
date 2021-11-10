@@ -1,20 +1,20 @@
-
 package POJO;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class Cuenta {
-    
-    private String numero;
-    private String sucursal;    
-    private static ArrayList<Cliente> clientes=null;
+public abstract class Cuenta implements Serializable {
 
-    public Cuenta(String numero,String sucursal,ArrayList<Cliente> clientes){
-        this.numero=numero;
-        this.sucursal=sucursal;
-        this.clientes=clientes;
-    }    
-    
+    private String numero;
+    private String sucursal;
+    private ArrayList<Cliente> clientes = null;
+
+    public Cuenta(String numero, String sucursal, ArrayList<Cliente> clientes) {
+        this.numero = numero;
+        this.sucursal = sucursal;
+        this.clientes = clientes;
+    }
+
     public String getNumero() {
         return numero;
     }
@@ -38,7 +38,13 @@ public abstract class Cuenta {
     public void setClientes(ArrayList clientes) {
         this.clientes = clientes;
     }
-    
-    
-    
+
+    @Override
+    public String toString() {
+        String mensaje = "CUENTA " + this.numero + "\nSucursal: " + this.sucursal+"\n";
+        for (Cliente x : clientes) {
+            mensaje += x.toString();
+        }
+        return mensaje;
+    }
 }

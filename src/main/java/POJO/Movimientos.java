@@ -4,7 +4,7 @@ package POJO;
 import java.sql.Time;
 import java.util.Date;
 
-public class Movimientos {
+public class Movimientos  {
     
     private String numeroCuenta;
     private Date fechaOperacion;

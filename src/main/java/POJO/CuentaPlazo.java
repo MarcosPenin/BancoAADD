@@ -39,4 +39,14 @@ public class CuentaPlazo extends Cuenta {
     public void setDepositoPlazo(double depositoPlazo) {
         this.depositoPlazo = depositoPlazo;
     }
+
+    @Override
+    public String toString() {
+        String mensaje = "CUENTA " + this.getNumero() + "\nSucursal: " + this.getSucursal() + "\nIntereses: " + intereses + "\nFecha vencimiento: " + fechaVencimiento+"\n";
+        for (Cliente x : super.getClientes()) {
+            mensaje += x.toString();
+        }
+        return mensaje;
+    }
+
 }

@@ -103,6 +103,7 @@ public class OperacionesCuentas {
             if (numCuenta.equals(x.getNumero())) {
                 Banco.getCuentas().remove(x);
                 respuesta = "La cuenta se ha eliminado con éxito";
+                OperacionesFichero.guardarDatos();
             }
         }
         return respuesta;
@@ -115,6 +116,7 @@ public class OperacionesCuentas {
             if (dni.equals(dni)) {
                 cuenta1.getClientes().remove(x);
                 System.out.println("Se ha eliminado el cliente");
+                OperacionesFichero.guardarDatos();
             }
         }
         return respuesta;
@@ -130,12 +132,27 @@ public class OperacionesCuentas {
                 String direccion = ControlData.lerString(sc);
                 x.setDireccion(direccion);
                 respuesta = "La modificación se ha guardado con éxito";
+                OperacionesFichero.guardarDatos();
             }
         }
         return respuesta;
     }
 
-    
-    
-    
+    public static void mostrarClientes(String numCuenta) {
+        Cuenta cuenta1 = OperacionesCuentas.buscarCuenta(numCuenta);
+        for (Cliente x : cuenta1.getClientes()) {
+            System.out.println(x.toString());
+        }
+    }
+
+    public static void mostrarCuentas(String dni) {
+        for (Cuenta x : Banco.getCuentas()) {
+            for (Cliente y : x.getClientes()) {
+                if (y.getDni() == dni) {
+                    System.out.println(x.toString());
+                }
+            }
+        }
+    }
+
 }
