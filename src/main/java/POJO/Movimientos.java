@@ -8,7 +8,6 @@ public class Movimientos  {
     
     private String numeroCuenta;
     private Date fechaOperacion;
-    private Time hora;
     private float cantidad;
     private Double saldoActual;
 
@@ -26,14 +25,6 @@ public class Movimientos  {
 
     public void setFechaOperacion(Date fechaOperacion) {
         this.fechaOperacion = fechaOperacion;
-    }
-
-    public Time getHora() {
-        return hora;
-    }
-
-    public void setHora(Time hora) {
-        this.hora = hora;
     }
 
     public float getCantidad() {

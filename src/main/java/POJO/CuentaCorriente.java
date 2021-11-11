@@ -31,7 +31,7 @@ public class CuentaCorriente extends Cuenta {
 
     @Override
     public String toString() {
-        String mensaje = "CUENTA " + this.getNumero() + "\nSucursal: " + this.getSucursal() + "\nSaldo actual: " + saldoActual+"\n";
+        String mensaje = "\nCUENTA " + this.getNumero() + "\nSucursal: " + this.getSucursal() + "\nSaldo actual: " + saldoActual+"\n";
         for (Cliente x : super.getClientes()) {
             mensaje += x.toString();
         }

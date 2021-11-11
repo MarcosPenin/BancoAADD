@@ -41,7 +41,7 @@ public abstract class Cuenta implements Serializable {
 
     @Override
     public String toString() {
-        String mensaje = "CUENTA " + this.numero + "\nSucursal: " + this.sucursal+"\n";
+        String mensaje = "\nCUENTA " + this.numero + "\nSucursal: " + this.sucursal+"\n";
         for (Cliente x : clientes) {
             mensaje += x.toString();
         }

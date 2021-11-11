@@ -42,7 +42,7 @@ public class CuentaPlazo extends Cuenta {
 
     @Override
     public String toString() {
-        String mensaje = "CUENTA " + this.getNumero() + "\nSucursal: " + this.getSucursal() + "\nIntereses: " + intereses + "\nFecha vencimiento: " + fechaVencimiento+"\n";
+        String mensaje = "\nCUENTA " + this.getNumero() + "\nSucursal: " + this.getSucursal() + "\nIntereses: " + intereses + "\nFecha vencimiento: " + fechaVencimiento+"\n";
         for (Cliente x : super.getClientes()) {
             mensaje += x.toString();
         }

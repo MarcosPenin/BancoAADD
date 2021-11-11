@@ -42,7 +42,7 @@ public class Cliente implements Serializable{
 
     @Override
     public String toString() {
-        return "CLIENTE\nNombre: " + this.nombre + "\nDNI: " + this.dni + "\nDirección: " + this.direccion;
+        return "\nCLIENTE\nNombre: " + this.nombre + "\nDNI: " + this.dni + "\nDirección: " + this.direccion;
     }
 
 }
