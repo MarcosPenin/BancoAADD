@@ -8,8 +8,11 @@ import POJO.Cliente;
 import POJO.Cuenta;
 import POJO.CuentaCorriente;
 import POJO.CuentaPlazo;
+import POJO.Movimiento;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
@@ -52,9 +55,7 @@ public class OperacionesCuentas {
 //            System.out.println(e.getMessage());
 //        }
 //        return cliente;
-
 //    }
-
     public static boolean comprobarCuenta(String numCuenta) {
         boolean disponible = true;
         if (Banco.getCuentas().isEmpty()) {
@@ -68,14 +69,14 @@ public class OperacionesCuentas {
         return disponible;
     }
 
-    public static Cliente comprobarCliente(String dniNuevo)throws DniInvalido {
+    public static Cliente comprobarCliente(String dniNuevo) throws DniInvalido {
         Cliente cliente = null;
         boolean flag;
         ControlData.comprobarDni(dniNuevo);
-       
+
         if (Banco.getCuentas().isEmpty()) {
             flag = false;
-            System.out.println("Por favor, introduce el nombre");
+            System.out.println("Por favor, introduce el nombre del cliente");
             String nombre = ControlData.lerString(sc);
             System.out.println("Introduce la dirección");
             String direccion = ControlData.lerString(sc);
@@ -104,16 +105,16 @@ public class OperacionesCuentas {
         return cliente;
     }
 
-    public static void anadirCuenta() throws CodigoIncorrecto,DniInvalido {
+    public static void anadirCuenta() throws CodigoIncorrecto, DniInvalido {
         byte opcion, opcion2;
         Menu tipoCuenta = new Menu(tipoCuenta());
         Menu siNo = new Menu(siNo());
 
         System.out.println("Introduce el número de cuenta");
         String numCuenta = ControlData.lerString(sc);
-      
-         ControlData.comprobarNumCuenta(numCuenta);
-       
+
+        ControlData.comprobarNumCuenta(numCuenta);
+
         Cuenta cuenta = null;
         if (!OperacionesCuentas.comprobarCuenta(numCuenta)) {
             System.out.println("Lo siento, ese número de cuenta no está disponible");
@@ -155,7 +156,8 @@ public class OperacionesCuentas {
         Banco.getCuentas().add(cuenta);
     }
 
-    public static void anadirCliente(String dni) throws ClienteRepetido,DniInvalido {
+    public static void anadirCliente(String dni) throws ClienteRepetido, DniInvalido {
+        ControlData.comprobarDni(dni);
         boolean flag = false;
         System.out.println("Introduzca el número de cuenta a la que desea añadir el cliente");
         String numCuenta = ControlData.lerString(sc);
@@ -211,11 +213,13 @@ public class OperacionesCuentas {
 
     }
 
-    public static void modificarDireccionCliente(String dni, String direccion) {
+    public static void modificarDireccionCliente(String dni) {
         String respuesta = "Lo siento, no se ha encontrado ningún cliente con ese DNI.";
         for (Cuenta x : Banco.getCuentas()) {
             for (Cliente j : x.getClientes()) {
                 if (j.getDni().equals(dni)) {
+                    System.out.println("Introduce la nueva direccion");
+                    String direccion = ControlData.lerString(sc);
                     j.setDireccion(direccion);
                     respuesta = "Dirección cambiada";
                 }
@@ -255,6 +259,83 @@ public class OperacionesCuentas {
         }
     }
 
+    public static void anadirMovimiento(String numCuenta) {
+        boolean flag = false;
+        Menu movimientos = new Menu(movimientos());
+        for (Cuenta x : Banco.getCuentas()) {
+            if (x.getNumero().equals(numCuenta)) {
+                if (x instanceof CuentaCorriente) {
+                    System.out.println("¿Deseas ingresar o retirar efectivo?");
+                    movimientos.printMenu();
+                    byte opcion = ControlData.lerByte(sc);
+                    Movimiento movimiento;
+                    if (opcion == 1) {
+                        System.out.println("¿Cuánto deseas ingresar?");
+                        double ingreso = ControlData.lerDouble(sc);
+                        ((CuentaCorriente) x).setSaldoActual(((CuentaCorriente) x).getSaldoActual() + ingreso);
+                        System.out.println("Se ha realizado el ingreso. Su nuevo saldo es de " + ((CuentaCorriente) x).getSaldoActual() + " euros.");
+                        flag = true;
+                        movimiento = new Movimiento(x.getNumero(), LocalDate.now(), ingreso, ((CuentaCorriente) x).getSaldoActual(), "Ingreso");
+                        ((CuentaCorriente) x).anadirMovimiento(movimiento);
+                    }
+                    if (opcion == 2) {
+                        System.out.println("¿Cuánto desea retirar?");
+                        double retirada = ControlData.lerDouble(sc);
+                        if (retirada <= ((CuentaCorriente) x).getSaldoActual()) {
+                            ((CuentaCorriente) x).setSaldoActual(((CuentaCorriente) x).getSaldoActual() - retirada);
+                            System.out.println("Se ha realizado la retirada. Su nuevo saldo es de " + ((CuentaCorriente) x).getSaldoActual() + " euros.");
+                            flag = true;
+                            movimiento = new Movimiento(x.getNumero(), LocalDate.now(), retirada, ((CuentaCorriente) x).getSaldoActual(), "Retirada");
+                            ((CuentaCorriente) x).anadirMovimiento(movimiento);
+                        }
+                    }
+
+                } else {
+                    System.out.println("Lo siento, no puede realizar operaciones sobre una cuenta a plazo");
+                    flag = true;
+                }
+            }
+        }
+        if (!flag) {
+            System.out.println("No se ha podido realizar la operación");
+        }
+    }
+
+    public static void consultarMovimientos(String numCuenta) {
+        boolean flag = false;
+        for (Cuenta x : Banco.getCuentas()) {
+            if (x.getNumero().equals(numCuenta)) {
+                if (x instanceof CuentaCorriente) {
+                    System.out.println("¿Desde qué fecha desea consultar los movimientos?.Introdúzcala en formato M/d/yyyy");
+                    String desde = ControlData.lerString(sc);
+                    System.out.println("¿Hasta qué fecha desea consultar los movimientos? Introdúzcala en formato M/d/yyyy");
+                    String hasta = ControlData.lerString(sc);
+                    try {
+                        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("M/d/yyyy");
+                        LocalDate fechaInicio = LocalDate.parse(desde, dateFormat);
+                        LocalDate fechaFin = LocalDate.parse(hasta, dateFormat);
+
+                        for (Movimiento y : ((CuentaCorriente) x).getMovimientos()) {
+                            if (y.getFechaOperacion().isAfter(fechaInicio) && y.getFechaOperacion().isBefore(fechaFin)) {
+                                System.out.println(y.toString());
+                                flag = true;
+                            }
+                        }
+                    } catch (DateTimeParseException e) {
+                        System.out.println("La fecha introducida no tiene un formato válido");
+                    }
+                } else {
+                    System.out.println("No puede realizar movimientos sobre un depósito a plazo");
+                }
+                flag = true;
+            }
+        }
+        if (!flag) {
+            System.out.println("No se ha encontrado ninguna cuenta con ese número");
+        }
+
+    }
+
     static ArrayList<String> tipoCuenta() {
         ArrayList<String> opciones = new ArrayList<String>();
         opciones.add("Cuenta corriente");
@@ -266,6 +347,13 @@ public class OperacionesCuentas {
         ArrayList<String> opciones = new ArrayList<String>();
         opciones.add("Sí");
         opciones.add("No");
+        return opciones;
+    }
+
+    static ArrayList<String> movimientos() {
+        ArrayList<String> opciones = new ArrayList<String>();
+        opciones.add("Ingresar");
+        opciones.add("Retirar");
         return opciones;
     }
 

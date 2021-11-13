@@ -8,6 +8,7 @@ public abstract class Cuenta implements Serializable {
     private String numero;
     private String sucursal;
     private ArrayList<Cliente> clientes = null;
+   
 
     public Cuenta(String numero, String sucursal, ArrayList<Cliente> clientes) {
         this.numero = numero;

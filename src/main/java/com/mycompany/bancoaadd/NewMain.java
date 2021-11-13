@@ -54,15 +54,17 @@ public class NewMain {
                     } catch (ClienteRepetido e) {
                         System.out.println(e.getMessage());
                     }catch(DniInvalido e){
-                        e.getMessage();
+                        System.out.println(e.getMessage());
                     }
                     break;
                 case 3:
-                    System.out.println("Pendiente de implementar");
+                    System.out.println("Introduce el número de cuenta a la que desea acceder");
+                    String numCuenta = ControlData.lerString(sc);
+                    OperacionesCuentas.anadirMovimiento(numCuenta);
                     break;
                 case 4:
                     System.out.println("Introduce el número de cuenta");
-                    String numCuenta = ControlData.lerString(sc);
+                    numCuenta = ControlData.lerString(sc);
                     OperacionesCuentas.eliminarCuenta(numCuenta);
                     break;
                 case 5:
@@ -82,15 +84,15 @@ public class NewMain {
                     dni = ControlData.lerString(sc);
                     OperacionesCuentas.mostrarCuentas(dni);
                     break;
-                case 8:
-                    System.out.println("Pendiente de implementar");
+                case 8:         
+                    System.out.println("Introduce el número de cuenta del que quieres consultar los movimientos");
+                    numCuenta=ControlData.lerString(sc);
+                    OperacionesCuentas.consultarMovimientos(numCuenta);
                     break;
                 case 9:
                     System.out.println("Introduce el número de DNI del cliente");
                     dni = ControlData.lerString(sc);
-                    System.out.println("Introduce la nueva dirección");
-                    String direccion = ControlData.lerString(sc);
-                    OperacionesCuentas.modificarDireccionCliente(dni, direccion);
+                    OperacionesCuentas.modificarDireccionCliente(dni);
                     break;
                 case 10:
                     for (Cuenta x : Banco.getCuentas()) {
