@@ -1,5 +1,8 @@
 package com.mycompany.bancoaadd;
 
+import Excepciones.ClienteRepetido;
+import Excepciones.CodigoIncorrecto;
+import Excepciones.DniInvalido;
 import POJO.Banco;
 import POJO.Cliente;
 import POJO.Cuenta;
@@ -24,7 +27,7 @@ public class NewMain {
     static Menu menuPrincipal = new Menu(opciones());
 
     public static void main(String[] args) {
-        
+
         OperacionesFichero.actualizarDatos();
 
         System.out.println("*********************************************************************************************");
@@ -35,12 +38,24 @@ public class NewMain {
             opcion = ControlData.lerByte(sc);
             switch (opcion) {
                 case 1:
+                    try {
                     OperacionesCuentas.anadirCuenta();
-                    break;
+                } catch (CodigoIncorrecto e) {
+                    System.out.println(e.getMessage());
+                }catch(DniInvalido e){
+                        System.out.println(e.getMessage());
+                }
+                break;
                 case 2:
-                    System.out.println("Introuzca el dni del cliente que desea añadir");
-                    String dni =ControlData.lerString(sc);
-                    OperacionesCuentas.anadirCliente(dni);
+                    System.out.println("Introuzca el DNI del cliente que desea añadir");
+                    String dni = ControlData.lerString(sc);
+                    try {
+                        OperacionesCuentas.anadirCliente(dni);
+                    } catch (ClienteRepetido e) {
+                        System.out.println(e.getMessage());
+                    }catch(DniInvalido e){
+                        e.getMessage();
+                    }
                     break;
                 case 3:
                     System.out.println("Pendiente de implementar");
@@ -71,11 +86,11 @@ public class NewMain {
                     System.out.println("Pendiente de implementar");
                     break;
                 case 9:
-                     System.out.println("Introduce el número de DNI del cliente");
+                    System.out.println("Introduce el número de DNI del cliente");
                     dni = ControlData.lerString(sc);
                     System.out.println("Introduce la nueva dirección");
-                    String direccion=ControlData.lerString(sc);
-                    OperacionesCuentas.modificarDireccionCliente(dni,direccion);
+                    String direccion = ControlData.lerString(sc);
+                    OperacionesCuentas.modificarDireccionCliente(dni, direccion);
                     break;
                 case 10:
                     for (Cuenta x : Banco.getCuentas()) {
@@ -84,11 +99,10 @@ public class NewMain {
                     break;
             }
         } while (opcion != 11);
-        
+
         OperacionesFichero.guardarDatos();
 
     }
-
 
     static ArrayList<String> opciones() {
         ArrayList<String> opciones = new ArrayList<String>();
@@ -106,5 +120,4 @@ public class NewMain {
         return opciones;
     }
 
- 
 }

@@ -1,15 +1,15 @@
 package POJO;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class CuentaPlazo extends Cuenta {
 
     private float intereses;
-    private Date fechaVencimiento;
+    private LocalDate fechaVencimiento;
     private double depositoPlazo;
 
-    public CuentaPlazo(String numero, String sucursal, ArrayList<Cliente> clientes, float intereses, Date fechaVencimiento, double depositoPlazo) {
+    public CuentaPlazo(String numero, String sucursal, ArrayList<Cliente> clientes, float intereses, LocalDate fechaVencimiento, double depositoPlazo) {
         super(numero, sucursal, clientes);
         this.intereses = intereses;
         this.fechaVencimiento = fechaVencimiento;
@@ -24,11 +24,11 @@ public class CuentaPlazo extends Cuenta {
         this.intereses = intereses;
     }
 
-    public Date getFechaVencimiento() {
+    public LocalDate getFechaVencimiento() {
         return fechaVencimiento;
     }
 
-    public void setFechaVencimiento(Date fechaVencimiento) {
+    public void setFechaVencimiento(LocalDate fechaVencimiento) {
         this.fechaVencimiento = fechaVencimiento;
     }
 
@@ -42,7 +42,7 @@ public class CuentaPlazo extends Cuenta {
 
     @Override
     public String toString() {
-        String mensaje = "\nCUENTA " + this.getNumero() + "\nSucursal: " + this.getSucursal() + "\nIntereses: " + intereses + "\nFecha vencimiento: " + fechaVencimiento+"\n";
+        String mensaje = "\nCUENTA plazo " + this.getNumero() + "\nSucursal: " + this.getSucursal() + "\nIntereses: " + intereses + "\nFecha vencimiento: " + fechaVencimiento+"\n";
         for (Cliente x : super.getClientes()) {
             mensaje += x.toString();
         }

@@ -1,6 +1,8 @@
 
 package utilidades;
 
+import Excepciones.CodigoIncorrecto;
+import Excepciones.DniInvalido;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,16 +16,27 @@ public class ControlData {
      * @param codigo
      * @return boolean que indica si el código cumple el patron
      */
-    public static boolean codigoCorrecto(String codigo){
-              
-        boolean correcto=false;
-        Pattern pat = Pattern.compile("[V][AEIOU][a-z]{3,4}([4-7]{2}|[8])");
-        Matcher mat = pat.matcher(codigo);     
-        if(mat.matches()){
-            correcto=true;
-        }
-        return correcto;
+    public static void comprobarNumCuenta(String codigo)throws CodigoIncorrecto{       
+        String valido="[aA-zZ]{5}[\\d]";    
+       if(Pattern.matches(valido, codigo)){
+           System.out.println("El número tiene el formato correcto");
+       }else{
+           throw new CodigoIncorrecto();
+       }
     }
+    
+     public static void comprobarDni(String dni)throws DniInvalido{       
+        String dniValido= "\\d{8}[A-HJ-NP-TV-Z]";
+        if(Pattern.matches(dniValido, dni)){
+           System.out.println("El número tiene el formato correcto");
+       }else{
+           throw new DniInvalido();
+       }
+    }
+     
+     
+    
+    
        
         /**
      * Comproba que un parámetro está dentro dun rango

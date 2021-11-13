@@ -1,15 +1,20 @@
 package operaciones;
 
-import Excepciones.ClienteNoExiste;
-import Excepciones.CuentaNoExiste;
+import Excepciones.ClienteRepetido;
+import Excepciones.CodigoIncorrecto;
+import Excepciones.DniInvalido;
 import POJO.Banco;
 import POJO.Cliente;
 import POJO.Cuenta;
 import POJO.CuentaCorriente;
 import POJO.CuentaPlazo;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import utilidades.ControlData;
 import utilidades.Menu;
 
@@ -17,39 +22,38 @@ public class OperacionesCuentas {
 
     static Scanner sc = new Scanner(System.in);
 
-    public static Cuenta buscarCuenta(String numCuenta) throws CuentaNoExiste {
-        Cuenta cuenta = null;
+//    public static Cuenta buscarCuenta(String numCuenta) throws CuentaNoExiste {
+//        Cuenta cuenta = null;
+//        for (Cuenta x : Banco.getCuentas()) {
+//            if (numCuenta.equals(x.getNumero())) {
+//                cuenta = x;
+//            }
+//            if (cuenta == null) {
+//                throw new CuentaNoExiste();
+//            }
+//        }
+//        return cuenta;
+//    }
+//
+//    public static Cliente buscarCliente(String dni) {
+//        Cliente cliente = null;
+//        try {
+//            for (Cuenta cuentaBanco : Banco.getCuentas()) {
+//                for (Cliente clienteBanco : cuentaBanco.getClientes()) {
+//                    if (clienteBanco.getDni().equals(dni)) {
+//                        cliente = clienteBanco;
+//                    }
+//                    if (cliente == null) {
+//                        throw new ClienteNoExiste();
+//                    }
+//                }
+//            }
+//        } catch (ClienteNoExiste e) {
+//            System.out.println(e.getMessage());
+//        }
+//        return cliente;
 
-        for (Cuenta x : Banco.getCuentas()) {
-            if (numCuenta.equals(x.getNumero())) {
-                cuenta = x;
-            }
-            if (cuenta == null) {
-                throw new CuentaNoExiste();
-            }
-        }
-        return cuenta;
-    }
-
-    public static Cliente buscarCliente(String dni) {
-        Cliente cliente = null;
-        try {
-            for (Cuenta cuentaBanco : Banco.getCuentas()) {
-                for (Cliente clienteBanco : cuentaBanco.getClientes()) {
-                    if (clienteBanco.getDni().equals(dni)) {
-                        cliente = clienteBanco;
-                    }
-                    if (cliente == null) {
-                        throw new ClienteNoExiste();
-                    }
-                }
-            }
-        } catch (ClienteNoExiste e) {
-            System.out.println(e.getMessage());
-        }
-        return cliente;
-
-    }
+//    }
 
     public static boolean comprobarCuenta(String numCuenta) {
         boolean disponible = true;
@@ -64,9 +68,11 @@ public class OperacionesCuentas {
         return disponible;
     }
 
-    public static Cliente comprobarCliente(String dniNuevo) {
+    public static Cliente comprobarCliente(String dniNuevo)throws DniInvalido {
         Cliente cliente = null;
         boolean flag;
+        ControlData.comprobarDni(dniNuevo);
+       
         if (Banco.getCuentas().isEmpty()) {
             flag = false;
             System.out.println("Por favor, introduce el nombre");
@@ -76,8 +82,8 @@ public class OperacionesCuentas {
             Cliente cliente1 = new Cliente(dniNuevo, nombre, direccion);
             cliente = cliente1;
         } else {
+            flag = false;
             for (Cuenta cuentaBanco : Banco.getCuentas()) {
-                flag = false;
                 for (Cliente clienteBanco : cuentaBanco.getClientes()) {
                     if (clienteBanco.getDni().equals(dniNuevo)) {
                         System.out.println("Ese cliente ya está registrado. Se han recuperado sus datos");
@@ -85,35 +91,35 @@ public class OperacionesCuentas {
                         cliente = clienteBanco;
                     }
                 }
-                if (flag == false) {
-                    System.out.println("Ese cliente no está registrado. Por favor, introduce su nombre");
-                    String nombre = ControlData.lerString(sc);
-                    System.out.println("Introduce la dirección");
-                    String direccion = ControlData.lerString(sc);
-                    Cliente cliente1 = new Cliente(dniNuevo, nombre, direccion);
-                    cliente = cliente1;
-                }
+            }
+            if (flag == false) {
+                System.out.println("Ese cliente no está registrado. Por favor, introduce su nombre");
+                String nombre = ControlData.lerString(sc);
+                System.out.println("Introduce la dirección");
+                String direccion = ControlData.lerString(sc);
+                Cliente cliente1 = new Cliente(dniNuevo, nombre, direccion);
+                cliente = cliente1;
             }
         }
         return cliente;
     }
 
-    public static void anadirCuenta() {
-
+    public static void anadirCuenta() throws CodigoIncorrecto,DniInvalido {
         byte opcion, opcion2;
         Menu tipoCuenta = new Menu(tipoCuenta());
         Menu siNo = new Menu(siNo());
 
         System.out.println("Introduce el número de cuenta");
         String numCuenta = ControlData.lerString(sc);
+      
+         ControlData.comprobarNumCuenta(numCuenta);
+       
         Cuenta cuenta = null;
-
         if (!OperacionesCuentas.comprobarCuenta(numCuenta)) {
             System.out.println("Lo siento, ese número de cuenta no está disponible");
         } else {
             System.out.println("Introduce la sucursal");
             String sucursal = ControlData.lerString(sc);
-
             ArrayList<Cliente> clientes = new ArrayList<>();
 
             do {
@@ -135,37 +141,40 @@ public class OperacionesCuentas {
                 double saldo = ControlData.lerDouble(sc);
                 cuenta = new CuentaCorriente(numCuenta, sucursal, clientes, saldo);
             } else if (opcion == 2) {
-                System.out.println("Define los intereses");
-                float intereses = ControlData.lerFloat(sc);
-                System.out.println("Define el depósito a plazo");
+                System.out.println("¿Cuánto dinero depositará?");
                 double depositoPlazo = ControlData.lerDouble(sc);
-                System.out.println("Introduce la fecha de vencimiento");
-                System.out.println("Año:");
-                int ano = ControlData.lerInt(sc);
-                System.out.println("Mes:");
-                int mes = ControlData.lerInt(sc);
-                System.out.println("Día:");
-                int dia = ControlData.lerInt(sc);
-                Date fechaVencimiento = new Date(ano, mes, dia);
+                System.out.println("¿Cuáles serán los intereses?");
+                float intereses = ControlData.lerFloat(sc);
+                System.out.println("¿En cuántos meses vencerá el depósito?");
+                int plazo = ControlData.lerInt(sc);
+                LocalDate fechaVencimiento = LocalDate.now().plusMonths(plazo);
                 cuenta = new CuentaPlazo(numCuenta, sucursal, clientes, intereses, fechaVencimiento, depositoPlazo);
             }
-            Banco.getCuentas().add(cuenta);
-        }
 
+        }
+        Banco.getCuentas().add(cuenta);
     }
 
-    public static void anadirCliente(String dni) {
+    public static void anadirCliente(String dni) throws ClienteRepetido,DniInvalido {
+        boolean flag = false;
         System.out.println("Introduzca el número de cuenta a la que desea añadir el cliente");
         String numCuenta = ControlData.lerString(sc);
-        try {
-            Cuenta cuenta1 = OperacionesCuentas.buscarCuenta(numCuenta);
-            Cliente cliente1 = OperacionesCuentas.comprobarCliente(dni);
-            cuenta1.getClientes().add(cliente1);
-            System.out.println("El clliente se ha añadido a la cuenta");
-        } catch (CuentaNoExiste e) {
-            System.out.println(e.getMessage());
+        for (Cuenta x : Banco.getCuentas()) {
+            if (x.getNumero().equals(numCuenta)) {
+                for (Cliente y : x.getClientes()) {
+                    if (y.getDni().equals(dni)) {
+                        throw new ClienteRepetido();
+                    }
+                }
+                Cliente cliente1 = OperacionesCuentas.comprobarCliente(dni);
+                x.getClientes().add(cliente1);
+                System.out.println("El cliente se ha añadido con éxito");
+                flag = true;
+            }
         }
-
+        if (!flag) {
+            System.out.println("Lo siento, no se ha encontrado ninguna cuenta con ese número");
+        }
     }
 
     public static void eliminarCuenta(String numCuenta) {
@@ -216,20 +225,23 @@ public class OperacionesCuentas {
     }
 
     public static void mostrarClientes(String numCuenta) {
-        try {
-            Cuenta cuenta1 = OperacionesCuentas.buscarCuenta(numCuenta);
-            for (Cliente x : cuenta1.getClientes()) {
-                System.out.println(x.toString());
+        boolean flag = false;
+        for (Cuenta x : Banco.getCuentas()) {
+            if (x.getNumero().equals(numCuenta)) {
+                for (Cliente y : x.getClientes()) {
+                    System.out.println(y.toString());
+                }
+                flag = true;
             }
-        } catch (CuentaNoExiste e) {
-            System.out.println(e.getMessage());
+        }
+        if (!flag) {
+            System.out.println("Lo siento, no se ha encontrado ninguna cuenta con ese número");
         }
 
     }
 
     public static void mostrarCuentas(String dni) {
-        boolean flag = false;      
-        
+        boolean flag = false;
         for (Cuenta x : Banco.getCuentas()) {
             for (Cliente y : x.getClientes()) {
                 if (y.getDni().equals(dni)) {
