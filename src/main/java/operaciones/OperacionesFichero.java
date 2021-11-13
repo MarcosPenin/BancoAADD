@@ -34,7 +34,6 @@ public class OperacionesFichero {
     }
 
     public static void actualizarDatos() {
-
         try {
             File archivo = new File("Archivo.dat");
             FileInputStream fis = new FileInputStream(archivo);

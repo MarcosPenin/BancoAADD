@@ -11,11 +11,11 @@ public class ControlData {
 
 
     /**
-     * Método que recoge el código introducido y determina si cumple el patrón
-     * requerido por la EMA para las vacunas
+     *   * Comprueba que el número de cuenta esté formado por cinco letras seguidas de un dígito numérico
      * @param codigo
-     * @return boolean que indica si el código cumple el patron
+     * @throws CodigoIncorrecto 
      */
+   
     public static void comprobarNumCuenta(String codigo)throws CodigoIncorrecto{       
         String valido="[aA-zZ]{5}[\\d]";    
        if(Pattern.matches(valido, codigo)){
@@ -24,6 +24,12 @@ public class ControlData {
            throw new CodigoIncorrecto();
        }
     }
+    
+    /**
+     * Comprueba que un DNI esté compuesto de ocho dígitos seguidos de una letra válida
+     * @param dni
+     * @throws DniInvalido 
+     */
     
      public static void comprobarDni(String dni)throws DniInvalido{       
         String dniValido= "\\d{8}[A-HJ-NP-TV-Z]";
@@ -34,8 +40,6 @@ public class ControlData {
        }
     }
      
-     
-    
     
        
         /**

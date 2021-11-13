@@ -25,50 +25,81 @@ public class OperacionesCuentas {
 
     static Scanner sc = new Scanner(System.in);
 
-//    public static Cuenta buscarCuenta(String numCuenta) throws CuentaNoExiste {
-//        Cuenta cuenta = null;
-//        for (Cuenta x : Banco.getCuentas()) {
-//            if (numCuenta.equals(x.getNumero())) {
-//                cuenta = x;
-//            }
-//            if (cuenta == null) {
-//                throw new CuentaNoExiste();
-//            }
-//        }
-//        return cuenta;
-//    }
-//
-//    public static Cliente buscarCliente(String dni) {
-//        Cliente cliente = null;
-//        try {
-//            for (Cuenta cuentaBanco : Banco.getCuentas()) {
-//                for (Cliente clienteBanco : cuentaBanco.getClientes()) {
-//                    if (clienteBanco.getDni().equals(dni)) {
-//                        cliente = clienteBanco;
-//                    }
-//                    if (cliente == null) {
-//                        throw new ClienteNoExiste();
-//                    }
-//                }
-//            }
-//        } catch (ClienteNoExiste e) {
-//            System.out.println(e.getMessage());
-//        }
-//        return cliente;
-//    }
-    public static boolean comprobarCuenta(String numCuenta) {
-        boolean disponible = true;
-        if (Banco.getCuentas().isEmpty()) {
+    /**
+     * Este método pide los datos necesarios para crear una nueva cuenta. Antes
+     * de empezar comprueba si el número de cuenta introducido es válido con el
+     * método de la clase ControlData "comprobar numCuenta". Si es válido
+     * comprueba si está disponible y le pide al usuario los datos necesarios
+     * para crear una Corriente o una Cuenta a Plazo según lo que este decida.
+     *
+     * @throws CodigoIncorrecto
+     * @throws DniInvalido
+     */
+    public static void anadirCuenta() throws CodigoIncorrecto, DniInvalido {
+        byte opcion, opcion2;
+        Menu tipoCuenta = new Menu(tipoCuenta());
+        Menu siNo = new Menu(siNo());
+
+        System.out.println("Introduce el número de cuenta");
+        String numCuenta = ControlData.lerString(sc);
+
+        ControlData.comprobarNumCuenta(numCuenta);
+
+        Cuenta cuenta = null;
+        if (!OperacionesCuentas.comprobarCuenta(numCuenta)) {
+            System.out.println("Lo siento, ese número de cuenta no está disponible");
         } else {
-            for (Cuenta x : Banco.getCuentas()) {
-                if (numCuenta.equals(x.getNumero())) {
-                    disponible = false;
-                }
+            System.out.println("Introduce la sucursal");
+            String sucursal = ControlData.lerString(sc);
+            ArrayList<Cliente> clientes = new ArrayList<>();
+
+            do {
+                System.out.println("Introduce el DNI del cliente");
+                String dni = ControlData.lerString(sc);
+
+                //Este método crea un nuevo cliente o recupera uno ya existente       
+                Cliente cliente = OperacionesCuentas.comprobarCliente(dni);
+                clientes.add(cliente);
+                System.out.println("¿Quieres añadir otro cliente?");
+                siNo.printMenu();
+                opcion2 = ControlData.lerByte(sc);
+            } while (opcion2 == 1);
+
+            System.out.println("Qué tipo de cuenta desea crear");
+            tipoCuenta.printMenu();
+            opcion = sc.nextByte();
+
+            if (opcion == 1) {
+                System.out.println("Introduce el saldo inicial");
+                double saldo = ControlData.lerDouble(sc);
+                cuenta = new CuentaCorriente(numCuenta, sucursal, clientes, saldo);
+            } else if (opcion == 2) {
+                System.out.println("¿Cuánto dinero depositará?");
+                double depositoPlazo = ControlData.lerDouble(sc);
+                System.out.println("¿Cuáles serán los intereses?");
+                float intereses = ControlData.lerFloat(sc);
+                System.out.println("¿En cuántos meses vencerá el depósito?");
+                int plazo = ControlData.lerInt(sc);
+                LocalDate fechaVencimiento = LocalDate.now().plusMonths(plazo);
+                cuenta = new CuentaPlazo(numCuenta, sucursal, clientes, intereses, fechaVencimiento, depositoPlazo);
             }
+
         }
-        return disponible;
+        Banco.getCuentas().add(cuenta);
     }
 
+    /**
+     * Este método controla la asignación de clientes a las cuentas. Antes de
+     * nada comprueba si el DNI introducido es válido, en caso contrario lanza
+     * una excepción. A continuación comprueba si hay algún cliente con ese DNI
+     * registrado en el banco. En caso afirmativo recupera sus datos y los
+     * devuelve. Si no lo hay solicita al usuario los datos necesarios para
+     * crear un nuevo cliente y lo devuelve.
+     *
+     * @param dniNuevo
+     * @return Cliente
+     * @throws DniInvalido
+     */
     public static Cliente comprobarCliente(String dniNuevo) throws DniInvalido {
         Cliente cliente = null;
         boolean flag;
@@ -105,57 +136,34 @@ public class OperacionesCuentas {
         return cliente;
     }
 
-    public static void anadirCuenta() throws CodigoIncorrecto, DniInvalido {
-        byte opcion, opcion2;
-        Menu tipoCuenta = new Menu(tipoCuenta());
-        Menu siNo = new Menu(siNo());
-
-        System.out.println("Introduce el número de cuenta");
-        String numCuenta = ControlData.lerString(sc);
-
-        ControlData.comprobarNumCuenta(numCuenta);
-
-        Cuenta cuenta = null;
-        if (!OperacionesCuentas.comprobarCuenta(numCuenta)) {
-            System.out.println("Lo siento, ese número de cuenta no está disponible");
+    /**
+     * Este método comprueba si el número de cuenta solicitado está disponible o
+     * ya ha sido utilizado
+     *
+     * @param numCuenta
+     * @return boolean
+     */
+    public static boolean comprobarCuenta(String numCuenta) {
+        boolean disponible = true;
+        if (Banco.getCuentas().isEmpty()) {
         } else {
-            System.out.println("Introduce la sucursal");
-            String sucursal = ControlData.lerString(sc);
-            ArrayList<Cliente> clientes = new ArrayList<>();
-
-            do {
-                System.out.println("Introduce el DNI del cliente");
-                String dni = ControlData.lerString(sc);
-                Cliente cliente = OperacionesCuentas.comprobarCliente(dni);
-                clientes.add(cliente);
-                System.out.println("¿Quieres añadir otro cliente?");
-                siNo.printMenu();
-                opcion2 = ControlData.lerByte(sc);
-            } while (opcion2 == 1);
-
-            System.out.println("Qué tipo de cuenta desea crear");
-            tipoCuenta.printMenu();
-            opcion = sc.nextByte();
-
-            if (opcion == 1) {
-                System.out.println("Introduce el saldo inicial");
-                double saldo = ControlData.lerDouble(sc);
-                cuenta = new CuentaCorriente(numCuenta, sucursal, clientes, saldo);
-            } else if (opcion == 2) {
-                System.out.println("¿Cuánto dinero depositará?");
-                double depositoPlazo = ControlData.lerDouble(sc);
-                System.out.println("¿Cuáles serán los intereses?");
-                float intereses = ControlData.lerFloat(sc);
-                System.out.println("¿En cuántos meses vencerá el depósito?");
-                int plazo = ControlData.lerInt(sc);
-                LocalDate fechaVencimiento = LocalDate.now().plusMonths(plazo);
-                cuenta = new CuentaPlazo(numCuenta, sucursal, clientes, intereses, fechaVencimiento, depositoPlazo);
+            for (Cuenta x : Banco.getCuentas()) {
+                if (numCuenta.equals(x.getNumero())) {
+                    disponible = false;
+                }
             }
-
         }
-        Banco.getCuentas().add(cuenta);
+        return disponible;
     }
 
+    /**
+     * Este método añade un cliente a una cuenta ya existente, siempre que esta
+     * exista y no tenga a ese mismo cliente ya asignado
+     *
+     * @param dni
+     * @throws ClienteRepetido
+     * @throws DniInvalido
+     */
     public static void anadirCliente(String dni) throws ClienteRepetido, DniInvalido {
         ControlData.comprobarDni(dni);
         boolean flag = false;
@@ -179,6 +187,11 @@ public class OperacionesCuentas {
         }
     }
 
+    /**
+     * Elimina una cuenta del registro de la clase Banco
+     *
+     * @param numCuenta
+     */
     public static void eliminarCuenta(String numCuenta) {
         int marcador = -1;
         for (int i = 0; i < Banco.getCuentas().size(); i++) {
@@ -194,6 +207,12 @@ public class OperacionesCuentas {
         }
     }
 
+    /**
+     * Elimina un cliente de una cuenta
+     *
+     * @param numCuenta
+     * @param dni
+     */
     public static void eliminarCliente(String numCuenta, String dni) {
         int marcador = -1, marcador2 = -1;
         for (int i = 0; i < Banco.getCuentas().size(); i++) {
@@ -213,6 +232,12 @@ public class OperacionesCuentas {
 
     }
 
+    /**
+     * Modifica la dirección de un cliente. El cambio se propaga a todas las
+     * cuentas en las que está registrado
+     *
+     * @param dni
+     */
     public static void modificarDireccionCliente(String dni) {
         String respuesta = "Lo siento, no se ha encontrado ningún cliente con ese DNI.";
         for (Cuenta x : Banco.getCuentas()) {
@@ -228,6 +253,11 @@ public class OperacionesCuentas {
         System.out.println(respuesta);
     }
 
+    /**
+     * Muestra los clientes de una cuenta
+     *
+     * @param numCuenta
+     */
     public static void mostrarClientes(String numCuenta) {
         boolean flag = false;
         for (Cuenta x : Banco.getCuentas()) {
@@ -244,6 +274,11 @@ public class OperacionesCuentas {
 
     }
 
+    /**
+     * Muestra las cuentas de un determinado cliente
+     *
+     * @param dni
+     */
     public static void mostrarCuentas(String dni) {
         boolean flag = false;
         for (Cuenta x : Banco.getCuentas()) {
@@ -259,6 +294,14 @@ public class OperacionesCuentas {
         }
     }
 
+    /**
+     * Añade un movimiento al registro de una cuenta. Será un ingreso o una
+     * retirada en función de lo que indique el usuario. Como restricciones, no
+     * se pueden añadir movimientos a una CuentaPlazo ni realizar retiradas que
+     * superen el saldo de la cuenta indicada
+     *
+     * @param numCuenta
+     */
     public static void anadirMovimiento(String numCuenta) {
         boolean flag = false;
         Menu movimientos = new Menu(movimientos());
@@ -274,7 +317,6 @@ public class OperacionesCuentas {
                         double ingreso = ControlData.lerDouble(sc);
                         ((CuentaCorriente) x).setSaldoActual(((CuentaCorriente) x).getSaldoActual() + ingreso);
                         System.out.println("Se ha realizado el ingreso. Su nuevo saldo es de " + ((CuentaCorriente) x).getSaldoActual() + " euros.");
-                        flag = true;
                         movimiento = new Movimiento(x.getNumero(), LocalDate.now(), ingreso, ((CuentaCorriente) x).getSaldoActual(), "Ingreso");
                         ((CuentaCorriente) x).anadirMovimiento(movimiento);
                     }
@@ -284,12 +326,13 @@ public class OperacionesCuentas {
                         if (retirada <= ((CuentaCorriente) x).getSaldoActual()) {
                             ((CuentaCorriente) x).setSaldoActual(((CuentaCorriente) x).getSaldoActual() - retirada);
                             System.out.println("Se ha realizado la retirada. Su nuevo saldo es de " + ((CuentaCorriente) x).getSaldoActual() + " euros.");
-                            flag = true;
                             movimiento = new Movimiento(x.getNumero(), LocalDate.now(), retirada, ((CuentaCorriente) x).getSaldoActual(), "Retirada");
                             ((CuentaCorriente) x).anadirMovimiento(movimiento);
+                        } else {
+                            System.out.println("SALDO INSUFICIENTE");
                         }
                     }
-
+                    flag = true;
                 } else {
                     System.out.println("Lo siento, no puede realizar operaciones sobre una cuenta a plazo");
                     flag = true;
@@ -301,6 +344,13 @@ public class OperacionesCuentas {
         }
     }
 
+    /**
+     * A partir de un número de cuenta, se solicita al usuario que indique dos
+     * fechas y se le muestra los movimientos que se han realizado en esa cuenta
+     * en el período comprendido entre ellas
+     *
+     * @param numCuenta
+     */
     public static void consultarMovimientos(String numCuenta) {
         boolean flag = false;
         for (Cuenta x : Banco.getCuentas()) {
@@ -335,7 +385,20 @@ public class OperacionesCuentas {
         }
 
     }
+/**
+ * Imprime la información de todas las cuentas guardadas
+ */
+    public static void mostrarTodo() {
+        for (Cuenta x : Banco.getCuentas()) {
+            System.out.println(x.toString());
+        }
+    }
 
+    /**
+     * Menús necesarios para algunos de los métodos
+     *
+     * @return
+     */
     static ArrayList<String> tipoCuenta() {
         ArrayList<String> opciones = new ArrayList<String>();
         opciones.add("Cuenta corriente");

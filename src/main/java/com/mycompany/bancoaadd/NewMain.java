@@ -47,7 +47,7 @@ public class NewMain {
                 }
                 break;
                 case 2:
-                    System.out.println("Introuzca el DNI del cliente que desea añadir");
+                    System.out.println("Introduzca el DNI del cliente que desea añadir");
                     String dni = ControlData.lerString(sc);
                     try {
                         OperacionesCuentas.anadirCliente(dni);
